@@ -45,6 +45,22 @@ public class ChatController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
+        if (chatRequest.messages().size() > 50) {
+            LOGGER.warn("Chat request exceeds maximum allowed messages (50)");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Request exceeds maximum allowed message count (50).");
+        }
+
+        for (ResponseMessage msg : chatRequest.messages()) {
+            if (msg.content() != null && msg.content().length() > 4000) {
+                LOGGER.warn("Chat message exceeds maximum allowed length (4000 chars)");
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "A message exceeds the maximum allowed length of 4000 characters.");
+            }
+        }
+
         ChatHistory chatHistory = convertSKChatHistory(chatRequest);
 
 

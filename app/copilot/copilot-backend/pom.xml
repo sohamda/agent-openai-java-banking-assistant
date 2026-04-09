@@ -21,6 +21,7 @@
 		<semantic-kernel.version>1.2.2</semantic-kernel.version>
 		<mockito-inline.version>4.5.1</mockito-inline.version>
 		<maven.compiler-plugin.version>3.11.0</maven.compiler-plugin.version>
+		<bucket4j.version>8.10.1</bucket4j.version>
 
 		<maven.spotless-plugin.version>2.40.0</maven.spotless-plugin.version>
 		<google.java.format.version>1.18.1</google.java.format.version>
@@ -126,6 +127,13 @@
 			<groupId>com.microsoft.openai.samples.assistant</groupId>
 			<artifactId>semantickernel-openapi-plugin</artifactId>
 			<version>1.1.5-SNAPSHOT</version>
+		</dependency>
+
+		<!-- Rate limiting -->
+		<dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j-core</artifactId>
+			<version>${bucket4j.version}</version>
 		</dependency>
 
 	</dependencies>
