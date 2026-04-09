@@ -1,4 +1,4 @@
-FROM node:18-alpine AS build
+FROM node:18-alpine@sha256:8d6421d663b4c28fd3ebc498332f249011d118945588d0a35cb9bc4b8ca09d9e AS build
 
 # make the 'app' folder the current working directory
 WORKDIR /app
@@ -9,7 +9,7 @@ COPY . .
 RUN npm install
 RUN npm run build
 
-FROM nginx:alpine
+FROM nginx:alpine@sha256:645eda1c2477aaa9b879f73909b9222c6f19798dd45be6706268d82a661c6e6d
 
 WORKDIR /usr/share/nginx/html
 COPY --from=build /app/build .
@@ -17,4 +17,5 @@ COPY --from=build /app/nginx/nginx.conf.template /etc/nginx/conf.d
 
 EXPOSE 80
 
+USER nginx
 CMD ["/bin/sh", "-c", "envsubst < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g \"daemon off;\""]
