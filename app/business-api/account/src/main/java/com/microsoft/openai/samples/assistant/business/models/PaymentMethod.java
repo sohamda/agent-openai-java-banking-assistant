@@ -23,9 +23,9 @@ public record PaymentMethod(
         }
         String digits = cardNumber.replaceAll("\\D", "");
         if (digits.length() < 4) {
-            return null;
+            return "****";
         }
-        return "*".repeat(digits.length() - 4) + digits.substring(digits.length() - 4);
+        return "************" + digits.substring(digits.length() - 4);
     }
 }
 
