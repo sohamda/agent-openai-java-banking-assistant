@@ -74,6 +74,7 @@ param documentIntelligenceSkuName string = 'S0'
 
 param containerAppsEnvironmentName string = ''
 param containerRegistryName string = ''
+param keyVaultName string = ''
 
 param copilotContainerAppName string = ''
 param webContainerAppName string = ''
@@ -123,6 +124,28 @@ module monitoring 'shared/monitor/monitoring.bicep' = if (useApplicationInsights
     tags: tags
     applicationInsightsName: !empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}'
     logAnalyticsName: !empty(logAnalyticsName) ? logAnalyticsName : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
+  }
+}
+
+// Centralized Key Vault for secrets management
+module keyVault 'shared/security/keyvault.bicep' = {
+  name: 'keyvault'
+  scope: resourceGroup
+  params: {
+    name: !empty(keyVaultName) ? keyVaultName : '${abbrs.keyVaultVaults}${resourceToken}'
+    location: location
+    tags: tags
+  }
+}
+
+// Store App Insights connection string as a Key Vault secret
+module appInsightsConnectionStringSecret 'shared/security/keyvault-secret.bicep' = if (useApplicationInsights) {
+  name: 'appinsights-connection-string-secret'
+  scope: resourceGroup
+  params: {
+    name: 'applicationinsights-connection-string'
+    keyVaultName: keyVault.outputs.name
+    secretValue: monitoring.outputs.applicationInsightsConnectionString
   }
 }
 
@@ -323,6 +346,8 @@ module storage 'shared/storage/storage-account.bicep' = {
     location: storageResourceGroupLocation
     tags: tags
     allowBlobPublicAccess: false
+    allowSharedKeyAccess: false
+    defaultToOAuthAuthentication: true
     publicNetworkAccess: 'Enabled'
     sku: {
       name: storageSkuName
@@ -375,6 +400,17 @@ module documentIntelligenceRoleCopilot 'shared/security/role.bicep' = {
   }
 }
 
+// Key Vault Secrets User role for copilot managed identity
+module keyVaultRoleCopilot 'shared/security/role.bicep' = {
+  scope: resourceGroup
+  name: 'keyvault-role-copilot'
+  params: {
+    principalId: copilot.outputs.SERVICE_API_IDENTITY_PRINCIPAL_ID
+    roleDefinitionId: '4633458b-17de-408a-b874-0445c86b69e0'
+    principalType: 'ServicePrincipal'
+  }
+}
+
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
 output AZURE_RESOURCE_GROUP string = resourceGroup.name
@@ -402,6 +438,9 @@ output AZURE_DOCUMENT_INTELLIGENCE_RESOURCE_GROUP string = documentIntelligenceR
 output AZURE_STORAGE_ACCOUNT string = storage.outputs.name
 output AZURE_STORAGE_CONTAINER string = storageContainerName
 output AZURE_STORAGE_RESOURCE_GROUP string = storageResourceGroup.name
+
+output AZURE_KEY_VAULT_NAME string = keyVault.outputs.name
+output AZURE_KEY_VAULT_ENDPOINT string = keyVault.outputs.endpoint
 
 
 
