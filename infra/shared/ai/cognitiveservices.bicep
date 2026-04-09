@@ -9,14 +9,14 @@ param deployments array = []
 param kind string = 'OpenAI'
 
 @allowed([ 'Enabled', 'Disabled' ])
-param publicNetworkAccess string = 'Enabled'
+param publicNetworkAccess string = 'Disabled'
 param sku object = {
   name: 'S0'
 }
 
 param allowedIpRules array = []
 param networkAcls object = empty(allowedIpRules) ? {
-  defaultAction: 'Allow'
+  defaultAction: 'Deny'
 } : {
   ipRules: allowedIpRules
   defaultAction: 'Deny'

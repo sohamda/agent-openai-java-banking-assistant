@@ -126,6 +126,61 @@ module monitoring 'shared/monitor/monitoring.bicep' = if (useApplicationInsights
   }
 }
 
+module openAi 'shared/ai/cognitiveservices.bicep' =  {
+  name: 'openai'
+  scope: openAiResourceGroup
+  params: {
+    name: !empty(openAiServiceName) ? openAiServiceName : '${abbrs.cognitiveServicesAccounts}${resourceToken}'
+    location: !empty(customOpenAiResourceGroupLocation) ? customOpenAiResourceGroupLocation : openAiResourceGroupLocation
+    tags: tags
+    sku: {
+      name: openAiSkuName
+    }
+    deployments: [
+      {
+        name: chatGptDeploymentName
+        model: {
+          format: 'OpenAI'
+          name: chatGptModelName
+          version: chatGptModelVersion
+        }
+        sku: {
+          name: chatGptDeploymentSkuName
+          capacity: chatGptDeploymentCapacity
+        }
+      }
+      
+    ]
+  }
+}
+
+module documentIntelligence 'shared/ai/cognitiveservices.bicep' = {
+  name: 'documentIntelligence'
+  scope: documentIntelligenceResourceGroup
+  params: {
+    name: !empty(documentIntelligenceServiceName) ? documentIntelligenceServiceName : '${abbrs.cognitiveServicesFormRecognizer}${resourceToken}'
+    kind: 'FormRecognizer'
+    location: documentIntelligenceResourceGroupLocation
+    tags: tags
+    sku: {
+      name: documentIntelligenceSkuName
+    }
+  }
+}
+
+module networking 'shared/network/private-networking.bicep' = {
+  name: 'networking'
+  scope: resourceGroup
+  params: {
+    location: location
+    tags: tags
+    vnetName: '${abbrs.networkVirtualNetworks}${resourceToken}'
+    openAiPrivateEndpointName: 'pe-openai-${resourceToken}'
+    documentIntelligencePrivateEndpointName: 'pe-docint-${resourceToken}'
+    openAiAccountId: openAi.outputs.id
+    documentIntelligenceAccountId: documentIntelligence.outputs.id
+  }
+}
 
 module containerApps 'shared/host/container-apps.bicep' = {
   name: 'container-apps'
@@ -138,6 +193,7 @@ module containerApps 'shared/host/container-apps.bicep' = {
     containerRegistryName: !empty(containerRegistryName) ? containerRegistryName : '${abbrs.containerRegistryRegistries}${resourceToken}'
     logAnalyticsWorkspaceName: monitoring.outputs.logAnalyticsWorkspaceName
     applicationInsightsName: monitoring.outputs.applicationInsightsName
+    infrastructureSubnetId: networking.outputs.containerAppsSubnetId
   }
 }
 
@@ -271,47 +327,6 @@ module web 'app/web.bicep' = {
 }
 
 
-module openAi 'shared/ai/cognitiveservices.bicep' =  {
-  name: 'openai'
-  scope: openAiResourceGroup
-  params: {
-    name: !empty(openAiServiceName) ? openAiServiceName : '${abbrs.cognitiveServicesAccounts}${resourceToken}'
-    location: !empty(customOpenAiResourceGroupLocation) ? customOpenAiResourceGroupLocation : openAiResourceGroupLocation
-    tags: tags
-    sku: {
-      name: openAiSkuName
-    }
-    deployments: [
-      {
-        name: chatGptDeploymentName
-        model: {
-          format: 'OpenAI'
-          name: chatGptModelName
-          version: chatGptModelVersion
-        }
-        sku: {
-          name: chatGptDeploymentSkuName
-          capacity: chatGptDeploymentCapacity
-        }
-      }
-      
-    ]
-  }
-}
-
-module documentIntelligence 'shared/ai/cognitiveservices.bicep' = {
-  name: 'documentIntelligence'
-  scope: documentIntelligenceResourceGroup
-  params: {
-    name: !empty(documentIntelligenceServiceName) ? documentIntelligenceServiceName : '${abbrs.cognitiveServicesFormRecognizer}${resourceToken}'
-    kind: 'FormRecognizer'
-    location: documentIntelligenceResourceGroupLocation
-    tags: tags
-    sku: {
-      name: documentIntelligenceSkuName
-    }
-  }
-}
 
 
 
