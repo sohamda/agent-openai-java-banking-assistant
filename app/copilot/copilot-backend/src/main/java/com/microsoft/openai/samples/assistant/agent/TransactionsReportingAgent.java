@@ -2,6 +2,7 @@
 package com.microsoft.openai.samples.assistant.agent;
 
 import com.azure.ai.openai.OpenAIAsyncClient;
+import com.azure.core.http.HttpHeaders;
 import com.microsoft.openai.samples.assistant.agent.cache.ToolExecutionCacheUtils;
 import com.microsoft.openai.samples.assistant.agent.cache.ToolsExecutionCache;
 import com.microsoft.openai.samples.assistant.plugin.LoggedUserPlugin;
@@ -48,7 +49,7 @@ public class TransactionsReportingAgent {
      %s
     """;
 
-    public TransactionsReportingAgent(OpenAIAsyncClient client, LoggedUserService loggedUserService, ToolsExecutionCache<Object> toolsExecutionCache, String modelId, String transactionAPIUrl, String accountAPIUrl){
+    public TransactionsReportingAgent(OpenAIAsyncClient client, LoggedUserService loggedUserService, ToolsExecutionCache<Object> toolsExecutionCache, String modelId, String transactionAPIUrl, String accountAPIUrl, String businessApiKey){
         this.client = client;
         this.loggedUserService = loggedUserService;
         this.toolsExecutionCache = toolsExecutionCache;
@@ -72,12 +73,16 @@ public class TransactionsReportingAgent {
         }
 
         //Used to retrieve transactions.
-        KernelPlugin openAPIImporterTransactionPlugin = SemanticKernelOpenAPIImporter
-                .builder()
-                .withPluginName("TransactionHistoryPlugin")
-                .withSchema(transactionAPIYaml)
-                .withServer(transactionAPIUrl)
-                .build();
+        SemanticKernelOpenAPIImporter.Builder transactionPluginBuilder =
+                SemanticKernelOpenAPIImporter.builder()
+                        .withPluginName("TransactionHistoryPlugin")
+                        .withSchema(transactionAPIYaml)
+                        .withServer(transactionAPIUrl);
+        if (businessApiKey != null && !businessApiKey.isBlank()) {
+            transactionPluginBuilder.withHttpHeaders(
+                    new HttpHeaders().set("X-API-Key", businessApiKey));
+        }
+        KernelPlugin openAPIImporterTransactionPlugin = transactionPluginBuilder.build();
 
 
         String accountAPIYaml = null;
@@ -89,12 +94,16 @@ public class TransactionsReportingAgent {
             throw new RuntimeException("Cannot find account-history.yaml file in the classpath",e);
         }
         //Used to retrieve account id. Transaction API requires account id to retrieve transactions
-        KernelPlugin openAPIImporterAccountPlugin = SemanticKernelOpenAPIImporter
-                .builder()
-                .withPluginName("AccountPlugin")
-                .withSchema(accountAPIYaml)
-                .withServer(accountAPIUrl)
-                .build();
+        SemanticKernelOpenAPIImporter.Builder accountPluginBuilder =
+                SemanticKernelOpenAPIImporter.builder()
+                        .withPluginName("AccountPlugin")
+                        .withSchema(accountAPIYaml)
+                        .withServer(accountAPIUrl);
+        if (businessApiKey != null && !businessApiKey.isBlank()) {
+            accountPluginBuilder.withHttpHeaders(
+                    new HttpHeaders().set("X-API-Key", businessApiKey));
+        }
+        KernelPlugin openAPIImporterAccountPlugin = accountPluginBuilder.build();
 
 
 

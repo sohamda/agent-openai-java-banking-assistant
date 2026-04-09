@@ -21,11 +21,11 @@ public class RouterAgent {
 
     private final ToolsExecutionCache toolsExecutionCache;
 
-    public RouterAgent(LoggedUserService loggedUserService, ToolsExecutionCache toolsExecutionCache, OpenAIAsyncClient openAIAsyncClient, DocumentIntelligenceClient documentIntelligenceClient, BlobStorageProxy blobStorageProxy, @Value("${openai.chatgpt.deployment}") String gptChatDeploymentModelId, @Value("${transactions.api.url}") String transactionsAPIUrl, @Value("${accounts.api.url}") String accountsAPIUrl, @Value("${payments.api.url}") String paymentsAPIUrl ){
+    public RouterAgent(LoggedUserService loggedUserService, ToolsExecutionCache toolsExecutionCache, OpenAIAsyncClient openAIAsyncClient, DocumentIntelligenceClient documentIntelligenceClient, BlobStorageProxy blobStorageProxy, @Value("${openai.chatgpt.deployment}") String gptChatDeploymentModelId, @Value("${transactions.api.url}") String transactionsAPIUrl, @Value("${accounts.api.url}") String accountsAPIUrl, @Value("${payments.api.url}") String paymentsAPIUrl, @Value("${business.api.key:}") String businessApiKey ){
         this.intentAgent = new IntentExtractor(openAIAsyncClient,gptChatDeploymentModelId);
-        this.paymentAgent = new PaymentAgent(openAIAsyncClient,loggedUserService,toolsExecutionCache,gptChatDeploymentModelId,documentIntelligenceClient,blobStorageProxy,transactionsAPIUrl,accountsAPIUrl,paymentsAPIUrl);
-        this.historyReportingAgent = new TransactionsReportingAgent(openAIAsyncClient,loggedUserService,toolsExecutionCache,gptChatDeploymentModelId,transactionsAPIUrl,accountsAPIUrl);
-        this.accountAgent = new AccountAgent(openAIAsyncClient,loggedUserService,toolsExecutionCache,gptChatDeploymentModelId,accountsAPIUrl);
+        this.paymentAgent = new PaymentAgent(openAIAsyncClient,loggedUserService,toolsExecutionCache,gptChatDeploymentModelId,documentIntelligenceClient,blobStorageProxy,transactionsAPIUrl,accountsAPIUrl,paymentsAPIUrl,businessApiKey);
+        this.historyReportingAgent = new TransactionsReportingAgent(openAIAsyncClient,loggedUserService,toolsExecutionCache,gptChatDeploymentModelId,transactionsAPIUrl,accountsAPIUrl,businessApiKey);
+        this.accountAgent = new AccountAgent(openAIAsyncClient,loggedUserService,toolsExecutionCache,gptChatDeploymentModelId,accountsAPIUrl,businessApiKey);
         this.toolsExecutionCache = toolsExecutionCache;
     }
 

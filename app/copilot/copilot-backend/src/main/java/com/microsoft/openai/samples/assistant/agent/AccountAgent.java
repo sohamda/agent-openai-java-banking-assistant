@@ -2,6 +2,7 @@
 package com.microsoft.openai.samples.assistant.agent;
 
 import com.azure.ai.openai.OpenAIAsyncClient;
+import com.azure.core.http.HttpHeaders;
 import com.microsoft.openai.samples.assistant.agent.cache.ToolExecutionCacheKey;
 import com.microsoft.openai.samples.assistant.agent.cache.ToolExecutionCacheUtils;
 import com.microsoft.openai.samples.assistant.agent.cache.ToolsExecutionCache;
@@ -47,7 +48,7 @@ public class AccountAgent {
      %s
     """;
 
-    public AccountAgent(OpenAIAsyncClient client, LoggedUserService loggedUserService,ToolsExecutionCache toolsExecutionCache, String modelId,String accountAPIUrl) {
+    public AccountAgent(OpenAIAsyncClient client, LoggedUserService loggedUserService, ToolsExecutionCache toolsExecutionCache, String modelId, String accountAPIUrl, String businessApiKey) {
         this.client = client;
         this.loggedUserService = loggedUserService;
         this.toolsExecutionCache = toolsExecutionCache;
@@ -70,12 +71,16 @@ public class AccountAgent {
             throw new RuntimeException("Cannot find account-history.yaml file in the classpath", e);
         }
         //Used to retrieve account id. Transaction API requires account id to retrieve transactions
-        KernelPlugin openAPIImporterAccountPlugin = SemanticKernelOpenAPIImporter
-                .builder()
-                .withPluginName("AccountsPlugin")
-                .withSchema(accountsAPIYaml)
-                .withServer(accountAPIUrl)
-                .build();
+        SemanticKernelOpenAPIImporter.Builder accountPluginBuilder =
+                SemanticKernelOpenAPIImporter.builder()
+                        .withPluginName("AccountsPlugin")
+                        .withSchema(accountsAPIYaml)
+                        .withServer(accountAPIUrl);
+        if (businessApiKey != null && !businessApiKey.isBlank()) {
+            accountPluginBuilder.withHttpHeaders(
+                    new HttpHeaders().set("X-API-Key", businessApiKey));
+        }
+        KernelPlugin openAPIImporterAccountPlugin = accountPluginBuilder.build();
 
 
         kernel = Kernel.builder()
