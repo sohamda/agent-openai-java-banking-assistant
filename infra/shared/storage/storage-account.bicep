@@ -10,10 +10,10 @@ param tags object = {}
 param accessTier string = 'Hot'
 param allowBlobPublicAccess bool = true
 param allowCrossTenantReplication bool = true
-param allowSharedKeyAccess bool = true
+param allowSharedKeyAccess bool = false
 param containers array = []
 param corsRules array = []
-param defaultToOAuthAuthentication bool = false
+param defaultToOAuthAuthentication bool = true
 param deleteRetentionPolicy object = {}
 @allowed([ 'AzureDnsZone', 'Standard' ])
 param dnsEndpointType string = 'Standard'
