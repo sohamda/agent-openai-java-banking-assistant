@@ -20,9 +20,9 @@ services:
       - ACCOUNTS_API_SERVER_URL=http://account:8080
       - PAYMENTS_API_SERVER_URL=http://payment:8080
       - TRANSACTIONS_API_SERVER_URL=http://transaction:8080
-      - AZURE_CLIENT_ID=${servicePrincipal}
-      - AZURE_CLIENT_SECRET=${servicePrincipalPassword}
-      - AZURE_TENANT_ID=${servicePrincipalTenant}
+    volumes:
+      - ${HOME}/.azure:/root/.azure:ro
+
   account:
     image: agent-openai-java-banking-assistant/business-account
     build:
