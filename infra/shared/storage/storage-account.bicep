@@ -9,7 +9,7 @@ param tags object = {}
   'Premium' ])
 param accessTier string = 'Hot'
 param allowBlobPublicAccess bool = true
-param allowCrossTenantReplication bool = true
+param allowCrossTenantReplication bool = false
 param allowSharedKeyAccess bool = true
 param containers array = []
 param corsRules array = []
@@ -93,6 +93,15 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   resource tableServices 'tableServices' = if (!empty(tables)) {
     name: 'default'
     properties: {}
+  }
+}
+
+resource storageLock 'Microsoft.Authorization/locks@2020-05-01' = {
+  name: 'storage-delete-lock'
+  scope: storage
+  properties: {
+    level: 'CanNotDelete'
+    notes: 'Prevent accidental deletion of the storage account'
   }
 }
 

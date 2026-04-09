@@ -50,6 +50,15 @@ resource deployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05-01
   }
 }]
 
+resource accountLock 'Microsoft.Authorization/locks@2020-05-01' = {
+  name: 'cognitive-services-delete-lock'
+  scope: account
+  properties: {
+    level: 'CanNotDelete'
+    notes: 'Prevent accidental deletion of the Cognitive Services account'
+  }
+}
+
 output endpoint string = account.properties.endpoint
 output endpoints object = account.properties.endpoints
 output id string = account.id

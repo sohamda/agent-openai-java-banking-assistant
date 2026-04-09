@@ -92,12 +92,22 @@ param useApplicationInsights bool = false
 var abbrs = loadJsonContent('shared/abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = { 'azd-env-name': environmentName, 'assignedTo': environmentName }
+var webContainerAppNameComputed = !empty(webContainerAppName) ? webContainerAppName : '${abbrs.appContainerApps}web-${resourceToken}'
 
 // Organize resources in a resource group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: !empty(resourceGroupName) ? resourceGroupName : '${abbrs.resourcesResourceGroups}${environmentName}'
   location: location
   tags: tags
+}
+
+resource resourceGroupLock 'Microsoft.Authorization/locks@2020-05-01' = {
+  name: 'rg-delete-lock'
+  scope: resourceGroup
+  properties: {
+    level: 'CanNotDelete'
+    notes: 'Prevent accidental deletion of the resource group'
+  }
 }
 
 resource openAiResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = if (!empty(openAiResourceGroupName)) {
@@ -153,7 +163,7 @@ module copilot 'app/copilot.bicep' = {
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
-    corsAcaUrl: ''
+    corsAcaUrl: 'https://${webContainerAppNameComputed}.${containerApps.outputs.defaultDomain}'
     exists: copilotAppExists
     env: [
       {
@@ -205,7 +215,7 @@ module account 'app/account.bicep' = {
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
-    corsAcaUrl: ''
+    corsAcaUrl: 'https://${webContainerAppNameComputed}.${containerApps.outputs.defaultDomain}'
     exists: accountAppExists
    
   }
@@ -223,7 +233,7 @@ module transaction 'app/transaction.bicep' = {
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
-    corsAcaUrl: ''
+    corsAcaUrl: 'https://${webContainerAppNameComputed}.${containerApps.outputs.defaultDomain}'
     exists: transactionAppExists
    
   }
@@ -241,7 +251,7 @@ module payment 'app/payment.bicep' = {
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
-    corsAcaUrl: ''
+    corsAcaUrl: 'https://${webContainerAppNameComputed}.${containerApps.outputs.defaultDomain}'
     exists: paymentAppExists
     env: [
       {
