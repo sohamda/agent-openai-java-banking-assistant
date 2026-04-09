@@ -12,6 +12,12 @@ param daprEnabled bool = false
 @description('Name of the Log Analytics workspace')
 param logAnalyticsWorkspaceName string
 
+@description('Resource ID of the infrastructure subnet for VNet integration')
+param infrastructureSubnetId string = ''
+
+@description('Set to true to use internal (private) ingress when VNet integration is enabled')
+param vnetInternal bool = true
+
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
   name: name
   location: location
@@ -25,6 +31,10 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-01'
       }
     }
     daprAIInstrumentationKey: daprEnabled && !empty(applicationInsightsName) ? applicationInsights.properties.InstrumentationKey : ''
+    vnetConfiguration: !empty(infrastructureSubnetId) ? {
+      infrastructureSubnetId: infrastructureSubnetId
+      internal: vnetInternal
+    } : null
   }
 }
 

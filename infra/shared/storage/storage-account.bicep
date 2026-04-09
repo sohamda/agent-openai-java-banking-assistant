@@ -26,10 +26,10 @@ param supportsHttpsTrafficOnly bool = true
 param tables array = []
 param networkAcls object = {
   bypass: 'AzureServices'
-  defaultAction: 'Allow'
+  defaultAction: 'Deny'
 }
 @allowed([ 'Enabled', 'Disabled' ])
-param publicNetworkAccess string = 'Enabled'
+param publicNetworkAccess string = 'Disabled'
 param sku object = { name: 'Standard_LRS' }
 
 resource storage 'Microsoft.Storage/storageAccounts@2023-01-01' = {

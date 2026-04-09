@@ -74,6 +74,7 @@ param documentIntelligenceSkuName string = 'S0'
 
 param containerAppsEnvironmentName string = ''
 param containerRegistryName string = ''
+param vnetName string = ''
 
 param copilotContainerAppName string = ''
 param webContainerAppName string = ''
@@ -127,6 +128,16 @@ module monitoring 'shared/monitor/monitoring.bicep' = if (useApplicationInsights
 }
 
 
+module vnet 'shared/host/vnet.bicep' = {
+  name: 'vnet'
+  scope: resourceGroup
+  params: {
+    name: !empty(vnetName) ? vnetName : '${abbrs.networkVirtualNetworks}${resourceToken}'
+    location: location
+    tags: tags
+  }
+}
+
 module containerApps 'shared/host/container-apps.bicep' = {
   name: 'container-apps'
   scope: resourceGroup
@@ -138,6 +149,7 @@ module containerApps 'shared/host/container-apps.bicep' = {
     containerRegistryName: !empty(containerRegistryName) ? containerRegistryName : '${abbrs.containerRegistryRegistries}${resourceToken}'
     logAnalyticsWorkspaceName: monitoring.outputs.logAnalyticsWorkspaceName
     applicationInsightsName: monitoring.outputs.applicationInsightsName
+    infrastructureSubnetId: vnet.outputs.infrastructureSubnetId
   }
 }
 
@@ -323,7 +335,11 @@ module storage 'shared/storage/storage-account.bicep' = {
     location: storageResourceGroupLocation
     tags: tags
     allowBlobPublicAccess: false
-    publicNetworkAccess: 'Enabled'
+    publicNetworkAccess: 'Disabled'
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Deny'
+    }
     sku: {
       name: storageSkuName
     }
@@ -337,6 +353,19 @@ module storage 'shared/storage/storage-account.bicep' = {
         publicAccess: 'None'
       }
     ]
+  }
+}
+
+module storagePrivateEndpoint 'shared/storage/storage-private-endpoint.bicep' = {
+  name: 'storage-private-endpoint'
+  scope: resourceGroup
+  params: {
+    name: '${abbrs.networkPrivateLinkServices}storage-${resourceToken}'
+    location: location
+    tags: tags
+    storageAccountId: storage.outputs.id
+    privateEndpointSubnetId: vnet.outputs.privateEndpointsSubnetId
+    vnetId: vnet.outputs.vnetId
   }
 }
 
