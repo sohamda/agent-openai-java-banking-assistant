@@ -138,6 +138,7 @@ module containerApps 'shared/host/container-apps.bicep' = {
     containerRegistryName: !empty(containerRegistryName) ? containerRegistryName : '${abbrs.containerRegistryRegistries}${resourceToken}'
     logAnalyticsWorkspaceName: monitoring.outputs.logAnalyticsWorkspaceName
     applicationInsightsName: monitoring.outputs.applicationInsightsName
+    infrastructureSubnetId: networking.outputs.containerAppsSubnetId
   }
 }
 
@@ -310,6 +311,20 @@ module documentIntelligence 'shared/ai/cognitiveservices.bicep' = {
     sku: {
       name: documentIntelligenceSkuName
     }
+  }
+}
+
+module networking 'shared/network/private-networking.bicep' = {
+  name: 'networking'
+  scope: resourceGroup
+  params: {
+    location: location
+    tags: tags
+    vnetName: '${abbrs.networkVirtualNetworks}${resourceToken}'
+    openAiPrivateEndpointName: 'pe-openai-${resourceToken}'
+    documentIntelligencePrivateEndpointName: 'pe-docint-${resourceToken}'
+    openAiAccountId: openAi.outputs.id
+    documentIntelligenceAccountId: documentIntelligence.outputs.id
   }
 }
 
