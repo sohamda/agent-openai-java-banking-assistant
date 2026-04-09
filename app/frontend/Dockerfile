@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . .
 
 # install project dependencies
-RUN npm install
+RUN npm ci --ignore-scripts
 RUN npm run build
 
 FROM nginx:alpine
