@@ -34,7 +34,7 @@ param metadataSearch string = 'Disabled'
 param networkRuleBypassOptions string = 'AzureServices'
 
 @description('Public network access setting')
-param publicNetworkAccess string = 'Enabled'
+param publicNetworkAccess string = 'Disabled'
 
 @description('Quarantine policy settings')
 param quarantinePolicy object = {
@@ -44,7 +44,7 @@ param quarantinePolicy object = {
 @description('Retention policy settings')
 param retentionPolicy object = {
   days: 7
-  status: 'disabled'
+  status: 'enabled'
 }
 
 @description('Scope maps setting')
@@ -52,13 +52,13 @@ param scopeMaps array = []
 
 @description('SKU settings')
 param sku object = {
-  name: 'Basic'
+  name: 'Premium'
 }
 
 @description('Soft delete policy settings')
 param softDeletePolicy object = {
   retentionDays: 7
-  status: 'disabled'
+  status: 'enabled'
 }
 
 @description('Trust policy settings')

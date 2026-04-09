@@ -31,6 +31,7 @@ module containerRegistry 'container-registry.bicep' = {
     location: location
     adminUserEnabled: containerRegistryAdminUserEnabled
     tags: tags
+    workspaceId: containerAppsEnvironment.outputs.logAnalyticsWorkspaceId
   }
 }
 
