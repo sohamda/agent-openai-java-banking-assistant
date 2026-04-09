@@ -22,6 +22,9 @@ param networkAcls object = empty(allowedIpRules) ? {
   defaultAction: 'Deny'
 }
 
+@description('Resource ID of the Log Analytics workspace for diagnostic settings')
+param logAnalyticsWorkspaceId string = ''
+
 resource account 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   name: name
   location: location
@@ -49,6 +52,21 @@ resource deployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05-01
     capacity: 20
   }
 }]
+
+resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
+  name: 'diag-${name}'
+  scope: account
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      { categoryGroup: 'allLogs', enabled: true }
+      { categoryGroup: 'audit', enabled: true }
+    ]
+    metrics: [
+      { category: 'AllMetrics', enabled: true }
+    ]
+  }
+}
 
 output endpoint string = account.properties.endpoint
 output endpoints object = account.properties.endpoints

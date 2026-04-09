@@ -87,7 +87,7 @@ param paymentAppExists bool = false
 param transactionAppExists bool = false
 
 @description('Use Application Insights for monitoring and performance tracing')
-param useApplicationInsights bool = false
+param useApplicationInsights bool = true
 
 var abbrs = loadJsonContent('shared/abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
