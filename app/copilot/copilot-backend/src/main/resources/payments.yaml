@@ -2,12 +2,16 @@ openapi: 3.0.3
 info:
   title: Payment API
   version: 1.0.0
+security:
+  - bearerAuth: []
 paths:
   /payments:
     post:
       operationId: submitPayment
       summary: Submit a payment request
       description: Submit a payment request
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         description: Payment to submit
@@ -23,6 +27,11 @@ paths:
         '500':
           description: Internal server error
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     Payment:
       type: object

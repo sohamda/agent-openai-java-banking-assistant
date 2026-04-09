@@ -2,12 +2,16 @@ openapi: 3.0.3
 info:
   title: Transaction History and Reporting API
   version: 1.0.0
+security:
+  - bearerAuth: []
 paths:
   /transactions/{accountid}:
     get:
       summary: Get transactions list.
       description: Gets the transactions lists. They can be filtered based on recipient name
       operationId: getTransactionsByRecipientName
+      security:
+        - bearerAuth: []
       parameters:
         - name: accountid
           description: id of specific account.
@@ -37,6 +41,8 @@ paths:
       operationId: notifyTransaction
       summary: Notify the banking transaction so that it's being stored in the history
       description: Notify the banking transaction so that it's being stored in the history
+      security:
+        - bearerAuth: []
       parameters:
         - name: accountid
           description: id of specific account.
@@ -60,6 +66,11 @@ paths:
         '500':
           description: Internal server error
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     Transaction:
       type: object

@@ -2,12 +2,16 @@ openapi: 3.0.3
 info:
   title: Account API
   version: 1.0.0
+security:
+  - bearerAuth: []
 paths:
   /users/{user_name}/accounts:
     get:
       summary: Get the list of all accounts for a specific user
       description: Get the list of all accounts for a specific user
       operationId: getAccountsByUserName
+      security:
+        - bearerAuth: []
       parameters:
         - name: user_name
           description: userName once the user has logged.
@@ -29,6 +33,8 @@ paths:
       summary: Get account details and available payment methods
       description: Get account details and available payment methods
       operationId: getAccountDetails
+      security:
+        - bearerAuth: []
       parameters:
         - name: accountid
           description: id of specific account.
@@ -51,6 +57,8 @@ paths:
       summary: Get payment method detail with available balance
       description: Get payment method detail with available balance
       operationId: getPaymentMethodDetails
+      security:
+        - bearerAuth: []
       parameters:
         - name: accountid
           description: id of specific account.
@@ -80,6 +88,8 @@ paths:
       summary: Get list of registered beneficiaries for a specific account
       description: Get list of registered beneficiaries for a specific account
       operationId: getBeneficiaryMethodDetails
+      security:
+        - bearerAuth: []
       parameters:
         - name: accountid
           description: id of specific account.
@@ -98,6 +108,11 @@ paths:
                 items:
                   $ref: '#/components/schemas/Beneficiary'
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     Account:
       type: object
