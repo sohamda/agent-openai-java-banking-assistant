@@ -32,7 +32,11 @@ export const Answer = ({
     const messageContent = answer.choices[0].message.content;
     const parsedAnswer = useMemo(() => parseAnswerToHtml(messageContent, isStreaming, onCitationClicked), [answer]);
 
-    const sanitizedAnswerHtml = DOMPurify.sanitize(parsedAnswer.answerHtml);
+    const sanitizedAnswerHtml = DOMPurify.sanitize(parsedAnswer.answerHtml, {
+        ALLOWED_TAGS: ["b", "i", "em", "strong", "p", "br", "ul", "ol", "li", "table", "tr", "td", "th", "a", "sup", "h1", "h2", "h3", "h4"],
+        ALLOWED_ATTR: ["href", "title", "class"],
+        ALLOWED_URI_REGEXP: /^(?:https?|mailto):/i
+    });
 
     return (
         <Stack className={`${styles.answerContainer} ${isSelected && styles.selected}`} verticalAlign="space-between">
