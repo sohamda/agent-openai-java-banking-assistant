@@ -26,19 +26,19 @@ jobs:
         steps:
         - name: Log in to Azure with service principal
           if: ${{ vars.AZURE_CLIENT_ID == '' }}
-          uses: azure/login@v2
+          uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2
           with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
         - name: Log in Azure Container Registry
           if: ${{ vars.AZURE_CLIENT_ID == '' }}
-          uses: azure/docker-login@v2
+          uses: azure/docker-login@15c4aadf093404726ab2ff205b2cdd33fa6d054c # v2
           with:
             login-server: ${{vars.ACR_NAME}}.azurecr.io
             username: ${{ secrets.SPI_CLIENT_ID   }}
             password: ${{ secrets.SPI_CLIENT_SECRET }}
         - name: Log in with Azure (Federated Credentials)
           if: ${{ vars.AZURE_CLIENT_ID != '' }}
-          uses: azure/login@v2
+          uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2
           with:
             client-id: ${{ vars.AZURE_CLIENT_ID }}
             tenant-id: ${{ vars.AZURE_TENANT_ID }}
@@ -46,7 +46,7 @@ jobs:
         - name: Login to Azure Container Registry (Federated Credentials)
           if: ${{ vars.AZURE_CLIENT_ID != '' }}  
           run: az acr login --name ${{vars.ACR_NAME}}
-        - uses: actions/checkout@v2
+        - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         - name: Build and Push to ACR
           run: |
             echo "Building image [${{ inputs.image-name }}] and environment [${{ inputs.env-name }}]"
