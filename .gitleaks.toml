@@ -1,0 +1,39 @@
+# Gitleaks configuration for agent-openai-java-banking-assistant
+# https://github.com/gitleaks/gitleaks#configuration
+
+title = "Gitleaks - Banking Assistant Secret Scanner"
+
+[extend]
+# Extend the default gitleaks ruleset
+useDefault = true
+
+[[rules]]
+id = "azure-openai-key"
+description = "Azure OpenAI API Key"
+regex = '''(?i)(azure[_\-\s]?openai[_\-\s]?(?:api[_\-\s]?)?key\s*[=:]\s*)([0-9a-f]{32})'''
+tags = ["azure", "openai", "api-key"]
+
+[[rules]]
+id = "azure-storage-account-key"
+description = "Azure Storage Account Key"
+regex = '''(?i)(DefaultEndpointsProtocol=https;AccountName=[^;]+;AccountKey=)[A-Za-z0-9+/=]{88}'''
+tags = ["azure", "storage", "api-key"]
+
+[[rules]]
+id = "azure-service-bus-connection-string"
+description = "Azure Service Bus Connection String"
+regex = '''Endpoint=sb://[^;]+\.servicebus\.windows\.net/;SharedAccessKeyName=[^;]+;SharedAccessKey=[A-Za-z0-9+/=]{44}'''
+tags = ["azure", "service-bus", "connection-string"]
+
+[[rules]]
+id = "azure-cosmos-db-key"
+description = "Azure Cosmos DB Account Key"
+regex = '''(?i)(cosmos[_\-\s]?(?:db[_\-\s]?)?(?:account[_\-\s]?)?key\s*[=:]\s*)[A-Za-z0-9+/=]{88}'''
+tags = ["azure", "cosmos-db", "api-key"]
+
+[allowlist]
+description = "Global allowlist for known false positives"
+paths = [
+  '''(.*?)(test|tests|spec|__tests__)(.*?)''',
+  '''\.gitleaks\.toml''',
+]
