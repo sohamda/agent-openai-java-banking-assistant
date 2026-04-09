@@ -37,42 +37,32 @@ public class DocumentIntelligenceInvoiceScanHelper {
        byte[] blobData = blobStorageProxy.getFileAsBytes(blobName);
 
         LOGGER.debug("Found blob file with name [{}] and size [{}]", blobName,blobData.length);
-        SyncPoller<AnalyzeResultOperation, AnalyzeResultOperation> analyzeInvoicePoller =
+        SyncPoller<AnalyzeOperationDetails, AnalyzeResult> analyzeInvoicePoller =
                 client.beginAnalyzeDocument("prebuilt-invoice",
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,  new AnalyzeDocumentRequest().setBase64Source(blobStorageProxy.getFileAsBytes(blobName)));
+                        new AnalyzeDocumentOptions(blobStorageProxy.getFileAsBytes(blobName)));
 
         return internalScan(analyzeInvoicePoller);
         
     }
     public Map<String,String> scan (File file) throws IOException {
 
-        SyncPoller<AnalyzeResultOperation, AnalyzeResultOperation> analyzeInvoicePoller =
+        SyncPoller<AnalyzeOperationDetails, AnalyzeResult> analyzeInvoicePoller =
                 client.beginAnalyzeDocument("prebuilt-invoice",
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,  new AnalyzeDocumentRequest().setBase64Source(Files.readAllBytes(file.toPath())));
+                        new AnalyzeDocumentOptions(Files.readAllBytes(file.toPath())));
 
         return internalScan(analyzeInvoicePoller);
 
     }
 
-    private  Map<String, String> internalScan(SyncPoller<AnalyzeResultOperation, AnalyzeResultOperation> analyzeInvoicePoller) {
-        AnalyzeResult analyzeInvoiceResult = analyzeInvoicePoller.getFinalResult().getAnalyzeResult();
+    private  Map<String, String> internalScan(SyncPoller<AnalyzeOperationDetails, AnalyzeResult> analyzeInvoicePoller) {
+        AnalyzeResult analyzeInvoiceResult = analyzeInvoicePoller.getFinalResult();
 
         LOGGER.debug("Document intelligence:start extracting data.." );
 
         Map<String,String> scanData = new HashMap<>();
 
         for (int i = 0; i < analyzeInvoiceResult.getDocuments().size(); i++) {
-            Document analyzedInvoice = analyzeInvoiceResult.getDocuments().get(i);
+            AnalyzedDocument analyzedInvoice = analyzeInvoiceResult.getDocuments().get(i);
             Map<String, DocumentField> invoiceFields = analyzedInvoice.getFields();
 
             DocumentField vendorNameField = invoiceFields.get("VendorName");

@@ -18,8 +18,7 @@
 		<java.version>17</java.version>
 
 		<spring-cloud-azure.version>5.14.0</spring-cloud-azure.version>
-		<semantic-kernel.version>1.2.2</semantic-kernel.version>
-		<mockito-inline.version>4.5.1</mockito-inline.version>
+		<semantic-kernel.version>1.4.3</semantic-kernel.version>
 		<maven.compiler-plugin.version>3.11.0</maven.compiler-plugin.version>
 
 		<maven.spotless-plugin.version>2.40.0</maven.spotless-plugin.version>
@@ -83,8 +82,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
-			<artifactId>mockito-inline</artifactId>
-			<version>${mockito-inline.version}</version>
+			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 
@@ -96,7 +94,7 @@
 		<dependency>
 			<groupId>com.azure</groupId>
 			<artifactId>azure-ai-documentintelligence</artifactId>
-			<version>1.0.0-beta.2</version>
+			<version>1.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
