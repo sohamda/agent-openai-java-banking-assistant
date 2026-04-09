@@ -1,0 +1,78 @@
+version: 2
+updates:
+  # Maven - copilot module
+  - package-ecosystem: "maven"
+    directory: "/app/copilot"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Maven - account business API
+  - package-ecosystem: "maven"
+    directory: "/app/business-api/account"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Maven - payment business API
+  - package-ecosystem: "maven"
+    directory: "/app/business-api/payment"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Maven - transactions-history business API
+  - package-ecosystem: "maven"
+    directory: "/app/business-api/transactions-history"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # npm - frontend
+  - package-ecosystem: "npm"
+    directory: "/app/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Docker - copilot
+  - package-ecosystem: "docker"
+    directory: "/app/copilot"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Docker - account business API
+  - package-ecosystem: "docker"
+    directory: "/app/business-api/account"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Docker - payment business API
+  - package-ecosystem: "docker"
+    directory: "/app/business-api/payment"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Docker - transactions-history business API
+  - package-ecosystem: "docker"
+    directory: "/app/business-api/transactions-history"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Docker - frontend
+  - package-ecosystem: "docker"
+    directory: "/app/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
