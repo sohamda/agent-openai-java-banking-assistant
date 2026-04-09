@@ -36,6 +36,15 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing
   name: applicationInsightsName
 }
 
+resource containerAppsEnvironmentLock 'Microsoft.Authorization/locks@2020-05-01' = {
+  name: 'containerenv-delete-lock'
+  scope: containerAppsEnvironment
+  properties: {
+    level: 'CanNotDelete'
+    notes: 'Prevent accidental deletion of the Container Apps environment'
+  }
+}
+
 output defaultDomain string = containerAppsEnvironment.properties.defaultDomain
 output id string = containerAppsEnvironment.id
 output name string = containerAppsEnvironment.name

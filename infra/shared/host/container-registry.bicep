@@ -44,7 +44,7 @@ param quarantinePolicy object = {
 @description('Retention policy settings')
 param retentionPolicy object = {
   days: 7
-  status: 'disabled'
+  status: 'enabled'
 }
 
 @description('Scope maps setting')
@@ -52,13 +52,13 @@ param scopeMaps array = []
 
 @description('SKU settings')
 param sku object = {
-  name: 'Basic'
+  name: 'Premium'
 }
 
 @description('Soft delete policy settings')
 param softDeletePolicy object = {
   retentionDays: 7
-  status: 'disabled'
+  status: 'enabled'
 }
 
 @description('Trust policy settings')
