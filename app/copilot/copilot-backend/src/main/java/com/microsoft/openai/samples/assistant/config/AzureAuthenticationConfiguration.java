@@ -3,7 +3,7 @@ package com.microsoft.openai.samples.assistant.config;
 
 import com.azure.core.credential.TokenCredential;
 import com.azure.identity.AzureCliCredentialBuilder;
-import com.azure.identity.EnvironmentCredentialBuilder;
+import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.identity.ManagedIdentityCredentialBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -24,8 +24,8 @@ public class AzureAuthenticationConfiguration {
 
     @Profile("docker")
     @Bean
-    public TokenCredential servicePrincipalTokenCredential() {
-        return new EnvironmentCredentialBuilder().build();
+    public TokenCredential dockerTokenCredential() {
+        return new DefaultAzureCredentialBuilder().build();
     }
 
     @Bean
