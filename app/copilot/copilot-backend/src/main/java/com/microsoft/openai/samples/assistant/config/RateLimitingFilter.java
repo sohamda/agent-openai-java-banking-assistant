@@ -10,8 +10,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -21,9 +22,10 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
     private static final int CHAT_REQUESTS_PER_MINUTE = 20;
     private static final int PAYMENTS_REQUESTS_PER_MINUTE = 10;
+    private static final int MAX_TRACKED_CLIENTS = 10_000;
 
-    private final Map<String, Bucket> chatBuckets = new ConcurrentHashMap<>();
-    private final Map<String, Bucket> paymentsBuckets = new ConcurrentHashMap<>();
+    private final Map<String, Bucket> chatBuckets = buildBoundedMap();
+    private final Map<String, Bucket> paymentsBuckets = buildBoundedMap();
 
     @Override
     protected void doFilterInternal(
@@ -31,7 +33,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        String clientKey = resolveClientKey(request);
+        String clientKey = request.getRemoteAddr();
 
         Bucket bucket = null;
         if (path.startsWith("/api/chat")) {
@@ -57,11 +59,13 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         return Bucket.builder().addLimit(limit).build();
     }
 
-    private String resolveClientKey(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            return forwarded.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
+    private static <K, V> Map<K, V> buildBoundedMap() {
+        return Collections.synchronizedMap(
+                new LinkedHashMap<K, V>(MAX_TRACKED_CLIENTS, 0.75f, true) {
+                    @Override
+                    protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+                        return size() > MAX_TRACKED_CLIENTS;
+                    }
+                });
     }
 }
