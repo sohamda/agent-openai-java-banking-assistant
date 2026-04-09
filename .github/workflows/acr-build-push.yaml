@@ -17,6 +17,7 @@ on:
 permissions:
   id-token: write
   contents: read
+  security-events: write
 
 jobs:
     build:
@@ -54,3 +55,25 @@ jobs:
             docker build . -t ${{vars.ACR_NAME}}.azurecr.io/${{inputs.image-name}}:${{github.sha}}
             docker push ${{vars.ACR_NAME}}.azurecr.io/${{inputs.image-name}}:${{github.sha}}
             echo "image successfully pushed: ${{vars.ACR_NAME}}.azurecr.io/${{inputs.image-name}}:${{github.sha}}"
+        - name: Run Trivy vulnerability scanner
+          uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # v0.30.0
+          with:
+            image-ref: ${{vars.ACR_NAME}}.azurecr.io/${{inputs.image-name}}:${{github.sha}}
+            format: sarif
+            output: trivy-results.sarif
+            severity: CRITICAL,HIGH
+            exit-code: '0'
+            ignore-unfixed: true
+        - name: Upload Trivy scan results to GitHub Security tab
+          if: always()
+          uses: github/codeql-action/upload-sarif@5c8a8a642e79153f5d047b10ec1cba1d1cc65699 # v3
+          with:
+            sarif_file: trivy-results.sarif
+        - name: Fail build on CRITICAL vulnerabilities
+          uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # v0.30.0
+          with:
+            image-ref: ${{vars.ACR_NAME}}.azurecr.io/${{inputs.image-name}}:${{github.sha}}
+            format: table
+            severity: CRITICAL
+            exit-code: '1'
+            ignore-unfixed: true
