@@ -8,8 +8,16 @@ metadata:
 #   nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: webapprouting.kubernetes.azure.com
+  tls:
+    # Replace <INGRESS_HOST> with your cluster hostname and pre-create the
+    # banking-tls Secret (type: kubernetes.io/tls) in the azure-open-ai namespace
+    # before applying this manifest.
+    - hosts:
+        - <INGRESS_HOST>
+      secretName: banking-tls
   rules:
-    - http:
+    - host: <INGRESS_HOST>
+      http:
         paths:
           - path: /api
             pathType: Prefix
