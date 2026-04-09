@@ -45,8 +45,8 @@ public class PaymentService {
         }
 
 
-        // Log the payment details
-        logger.info("Payment successful for: {}", payment.toString());
+        // Log the payment details (non-sensitive fields only)
+        logger.info("Payment processed: type={}, timestamp={}", payment.paymentType(), payment.timestamp());
 
         // Convert the Payment object into a Transaction object
         Transaction transaction = convertPaymentToTransaction(payment);
@@ -55,7 +55,7 @@ public class PaymentService {
          * Make the POST request. The transaction is sent to the transaction API. In a real scenario this would be an event published to a hub and consumed by the transaction API.
          */
 
-        logger.info("Notifying payment [{}] for account[{}]..", payment.description() , transaction.accountId());
+        logger.info("Notifying payment transaction..");
         webClientBuilder.build()
                 .post()
                 .uri(transactionAPIUrl + "/transactions/{accountId}", payment.accountId())
@@ -63,7 +63,7 @@ public class PaymentService {
                 .body(BodyInserters.fromValue(transaction))
                 .retrieve()
                 .bodyToMono(String.class)
-                .subscribe(response -> logger.info("Transaction notified for: {}", transaction.toString()));
+                .subscribe(response -> logger.info("Transaction notified: id={}, type={}", transaction.id(), transaction.type()));
     }
 
     private Transaction convertPaymentToTransaction(Payment payment) {

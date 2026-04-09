@@ -22,7 +22,7 @@ public class PaymentsController {
 
     @PostMapping("/payments")
     public void submitPayment(@RequestBody Payment payment) {
-        logger.info("Received payment request: {}", payment);
+        logger.info("Received payment request: type={}, timestamp={}", payment.paymentType(), payment.timestamp());
         paymentService.processPayment(payment);
     }
 }

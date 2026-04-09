@@ -34,7 +34,7 @@ public class OpenAIConfiguration {
 
         var httpLogOptions = new HttpLogOptions();
         // httpLogOptions.setPrettyPrintBody(true);
-        httpLogOptions.setLogLevel(HttpLogDetailLevel.BODY);
+        httpLogOptions.setLogLevel(HttpLogDetailLevel.BASIC);
 
         return new OpenAIClientBuilder()
                 .endpoint(endpoint)
@@ -59,8 +59,7 @@ public class OpenAIConfiguration {
         String endpoint = "https://%s.openai.azure.com".formatted(openAIServiceName);
 
         var httpLogOptions = new HttpLogOptions();
-        httpLogOptions.setPrettyPrintBody(true);
-        httpLogOptions.setLogLevel(HttpLogDetailLevel.BODY);
+        httpLogOptions.setLogLevel(HttpLogDetailLevel.BASIC);
 
         return new OpenAIClientBuilder()
                 .endpoint(endpoint)
