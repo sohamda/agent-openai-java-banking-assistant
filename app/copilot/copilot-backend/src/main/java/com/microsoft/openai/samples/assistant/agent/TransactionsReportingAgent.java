@@ -139,7 +139,7 @@ public class TransactionsReportingAgent {
                          agentChatHistory,
                          kernel,
                          InvocationContext.builder().withToolCallBehavior(
-                                         ToolCallBehavior.allowAllKernelFunctions(true))
+                                         ToolCallBehavior.allowOnlyKernelFunctions(true, kernel.getFunctions()))
                                  .withReturnMode(InvocationReturnMode.NEW_MESSAGES_ONLY)
                                 /* .withPromptExecutionSettings(
                                          PromptExecutionSettings.builder()
