@@ -15,6 +15,10 @@ spec:
             labels:
                 app: frontend
         spec:
+            securityContext:
+                runAsNonRoot: true
+                seccompProfile:
+                    type: RuntimeDefault
             containers:
                 - name: frontend
                   image: {{.Env.SERVICE_FRONTEND_IMAGE_NAME}}
@@ -24,3 +28,30 @@ spec:
                   envFrom:
                       - configMapRef:
                             name: azd-env-configmap
+                  securityContext:
+                      allowPrivilegeEscalation: false
+                      readOnlyRootFilesystem: true
+                      capabilities:
+                          drop:
+                              - ALL
+                  resources:
+                      requests:
+                          cpu: "100m"
+                          memory: "128Mi"
+                      limits:
+                          cpu: "500m"
+                          memory: "256Mi"
+                  volumeMounts:
+                      - name: tmp
+                        mountPath: /tmp
+                      - name: nginx-cache
+                        mountPath: /var/cache/nginx
+                      - name: nginx-run
+                        mountPath: /var/run
+            volumes:
+                - name: tmp
+                  emptyDir: {}
+                - name: nginx-cache
+                  emptyDir: {}
+                - name: nginx-run
+                  emptyDir: {}
